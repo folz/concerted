@@ -42,8 +42,8 @@ defmodule Concerted.RoomChannel do
   def handle_in("effort", %{"ingroup" => ingroup}, socket) do
     Presence.update(socket, socket.assigns.client_id, %{
       ingroup: case ingroup do
-        "true" -> true
-        "false" -> false
+        true -> true
+        false -> false
       end
     })
     send self(), :collective?

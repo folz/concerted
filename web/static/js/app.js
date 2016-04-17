@@ -20,14 +20,18 @@ import "phoenix_html";
 
 // import socket from "./socket"
 import {Socket, Presence} from "phoenix";
+import Shake from 'shake.js';
 
 let socket = new Socket("/socket", {params: {}});
 socket.connect();
 
 let userList = document.getElementById('user-list');
 let collective = document.getElementById('collective');
+let answer = document.getElementById('answer');
+let shaked = document.getElementById('shaked');
 let room = socket.channel("rooms:lobby", {});
 let presences = {};
+let timeout;
 
 let listBy = (id, {metas: [first, ...rest]}) => {
   first.name = id;
@@ -67,8 +71,21 @@ room.on("concerted", counts => {
 
 room.join();
 
-document.forms.isJumping.addEventListener('change', (e) => {
-  if(e.target.name === 'jumping') {
-    room.push("effort", {ingroup: e.target.value});
-  }
-})
+let shake = new Shake({threshold: 5});
+shake.start();
+
+window.addEventListener("shake", (e) => {
+  room.push("effort", {ingroup: true});
+  answer.innerHTML = "yes!"
+  clearTimeout(timeout);
+  timeout = setTimeout(stopShaking, 2000);
+}, false);
+
+let stopShaking = () => {
+  room.push("effort", {ingroup: false});
+  answer.innerHTML = "no :(";
+}
+
+if(!("DeviceOrientationEvent" in window) || window.DeviceOrientationEvent === null) {
+  alert("Not Supported");
+}
