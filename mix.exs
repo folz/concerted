@@ -34,6 +34,7 @@ defmodule Concerted.Mixfile do
      # TODO move to hex release
      {:phoenix_pubsub, github: "phoenixframework/phoenix_pubsub"},
      {:gettext, "~> 0.9"},
-     {:cowboy, "~> 1.0"}]
+     {:cowboy, "~> 1.0"},
+     {:uuid, "~> 1.1"}]
   end
 end

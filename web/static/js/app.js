@@ -21,7 +21,7 @@ import "phoenix_html";
 // import socket from "./socket"
 import {Socket, Presence} from "phoenix";
 
-let socket = new Socket("/socket", {params: {user_id: window.userId}});
+let socket = new Socket("/socket", {params: {}});
 socket.connect();
 
 let userList = document.getElementById('user-list');
@@ -31,11 +31,12 @@ let presences = {};
 let listBy = (id, {metas: [first, ...rest]}) => {
   first.name = id;
   first.count = rest.length + 1;
+  first.jumping = first.ingroup || rest.some((e) => e.ingroup === true);
   return first;
 }
 let render = (presences) => {
   userList.innerHTML = Presence.list(presences, listBy)
-    .map(user => `<li>${user.name} (${user.count})</li>`)
+    .map(user => `<li>${user.name} (${user.count}): ${user.jumping}</li>`)
     .join("")
 }
 
@@ -49,4 +50,17 @@ room.on("presence_diff", diff => {
   render(presences);
 });
 
+room.on("concerted", counts => {
+  console.log("concerted", counts);
+  if (counts.ingroupers / counts.total > .5) {
+    console.log("party?");
+  }
+});
+
 room.join();
+
+document.forms.isJumping.addEventListener('change', (e) => {
+  if(e.target.name === 'jumping') {
+    room.push("effort", {ingroup: e.target.value});
+  }
+})

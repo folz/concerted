@@ -19,8 +19,8 @@ defmodule Concerted.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(%{"user_id" => id}, socket) do
-    {:ok, assign(socket, :user_id, id)}
+  def connect(_, socket) do
+    {:ok, socket |> assign(:client_id, UUID.uuid4(:hex))}
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:

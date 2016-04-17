@@ -1,4 +1,9 @@
 <div class="jumbotron">
   <h2><%= node() %></h2>
+  <form name="isJumping">
+    <span>Are you jumping?</span>
+    <label><input type="radio" name="jumping" value="true" />Yes</label>
+    <label><input type="radio" name="jumping" value="false" />No</label>
+  </form>
   <ul id="user-list"></ul>
 </div>
