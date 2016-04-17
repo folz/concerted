@@ -10,7 +10,7 @@ defmodule Concerted.RoomChannel do
   end
 
   def handle_info(:ping, socket) do
-    push socket, "ping", %{ping: "ping"}
+    push socket, "ping", %{ping: inspect(:os.timestamp())}
     {:noreply, socket}
   end
 
@@ -35,7 +35,8 @@ defmodule Concerted.RoomChannel do
     {:noreply, socket}
   end
 
-  def handle_in("pong", "pong", socket) do
+  def handle_in("pong", data, socket) do
+    IO.inspect data
     {:noreply, socket}
   end
 

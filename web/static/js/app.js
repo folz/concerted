@@ -12,6 +12,7 @@
 // If you no longer want to use a dependency, remember
 // to also remove its path from "config.paths.watched".
 import "phoenix_html";
+import {Gauge} from "./gauge.min";
 
 // Import local files
 //
@@ -26,23 +27,33 @@ let socket = new Socket("/socket", {params: {}});
 socket.connect();
 
 let userList = document.getElementById('user-list');
-let collective = document.getElementById('collective');
-let answer = document.getElementById('answer');
 let shaked = document.getElementById('shaked');
+let gaugeElem = document.getElementById('gauge');
 let room = socket.channel("rooms:lobby", {});
 let presences = {};
 let timeout;
 
-let listBy = (id, {metas: [first, ...rest]}) => {
-  first.name = id;
-  first.jumping = first.ingroup || rest.some((e) => e.ingroup === true);
-  return first;
-}
-let render = (presences) => {
-  userList.innerHTML = Presence.list(presences, listBy)
-    .map(user => `<li>${user.name}: ${user.jumping}</li>`)
-    .join("")
-}
+let opts = {
+  lines: 12, // The number of lines to draw
+  angle: 0.15, // The length of each line
+  lineWidth: 0.44, // The line thickness
+  pointer: {
+    length: 0.9, // The radius of the inner circle
+    strokeWidth: 0.035, // The rotation offset
+    color: '#000000' // Fill color
+  },
+  limitMax: 'false',   // If true, the pointer will not go past the end of the gauge
+  percentColors: [[0.0, "#ff0000"], [0.70, "#f9c802"], [1.0, "#23df1e"]],
+  colorStart: '#6FADCF',   // Colors
+  colorStop: '#8FC0DA',    // just experiment with them
+  strokeColor: '#E0E0E0',   // to see which ones work best for you
+  generateGradient: true
+};
+
+let gauge = new Gauge(gaugeElem).setOptions(opts);
+gauge.maxValue = 100;
+gauge.animationSpeed = 8;
+gauge.set(0);
 
 room.on("ping", ping => {
   room.push("pong", "pong");
@@ -50,40 +61,40 @@ room.on("ping", ping => {
 
 room.on("presence_state", state => {
   Presence.syncState(presences, state);
-  render(presences);
 });
 
 room.on("presence_diff", diff => {
   Presence.syncDiff(presences, diff);
-  render(presences);
 });
 
 room.on("concerted", counts => {
   let ratio = counts.ingroupers / counts.total * 200;
-  collective.innerHTML = `
-    <div class="progress">
-      <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="${ratio}" aria-valuemin="0" aria-valuemax="50" style="width: ${ratio}%">
-        <span class="sr-only">${ratio}% Complete</span>
-      </div>
-    </div>
-  `;
+  if (gauge.value !== ratio) {
+    gauge.set((ratio || 1));
+  }
+
+  console.log("ratio is", ratio);
+
+  if (ratio >= 100) {
+    document.body.className = "ingroup";
+  } else {
+    document.body.className = "";
+  }
 });
 
 room.join();
 
-let shake = new Shake({threshold: 5});
+let shake = new Shake({threshold: 3});
 shake.start();
 
 window.addEventListener("shake", (e) => {
   room.push("effort", {ingroup: true});
-  answer.innerHTML = "yes!"
   clearTimeout(timeout);
-  timeout = setTimeout(stopShaking, 2000);
+  timeout = setTimeout(stopShaking, 3000);
 }, false);
 
 let stopShaking = () => {
   room.push("effort", {ingroup: false});
-  answer.innerHTML = "no :(";
 }
 
 if(!("DeviceOrientationEvent" in window) || window.DeviceOrientationEvent === null) {
