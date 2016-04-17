@@ -2,7 +2,7 @@ defmodule Concerted.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "rooms:*", Concerted.RoomChannel
+  channel "rooms:lobby", Concerted.RoomChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
@@ -19,8 +19,8 @@ defmodule Concerted.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(_params, socket) do
-    {:ok, socket}
+  def connect(%{"user_id" => id}, socket) do
+    {:ok, assign(socket, :user_id, id)}
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:
