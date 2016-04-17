@@ -1,6 +1,9 @@
 <div id="brand-wrapper"><span id="brand"><span>co</span>ncerted</span></div>
 
-<div class="instructions"><strong>Instructions:</strong><br />Jump around!</div>
+<div class="instructions">
+  <strong>Instructions:</strong><br />
+  <span class="wait-for-it">Wait for it...</span>
+  <span class="jump-around">Jump around!</span></div>
 
 <div id="shaked"></div>
 

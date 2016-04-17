@@ -2,15 +2,24 @@ defmodule Concerted.RoomChannel do
   use Concerted.Web, :channel
   alias Concerted.Presence
 
+  @hypes [[26, 62], [80, 115], [137, 155]]
+  @timings [[43, 62], [97, 115], [137, 155]]
+
   def join("rooms:lobby", _, socket) do
     send self(), :ping
+    send self(), :timings
     send self(), :after_join
     send self(), :collective?
     {:ok, socket}
   end
 
   def handle_info(:ping, socket) do
-    push socket, "ping", %{ping: inspect(:os.timestamp())}
+    push socket, "ping", %{ping: inspect(:os.system_time(:seconds))}
+    {:noreply, socket}
+  end
+
+  def handle_info(:timings, socket) do
+    push socket, "timings", %{hypes: @hypes, timings: @timings}
     {:noreply, socket}
   end
 
@@ -36,7 +45,11 @@ defmodule Concerted.RoomChannel do
   end
 
   def handle_in("pong", data, socket) do
-    IO.inspect data
+    {:noreply, socket}
+  end
+
+  def handle_in("start", _data, socket) do
+    broadcast! socket, "start", %{}
     {:noreply, socket}
   end
 

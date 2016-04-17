@@ -11,7 +11,39 @@
 html, body, .container, main {
    margin: 0;
    height: 100%;
+   background-color: #0b0b0b;
+   color: #aaa;
  }
+
+body.shaking, body.ingroup {
+  background-color: #0b0b22;
+}
+
+#gauge {
+  display: none;
+}
+
+.hype #gauge {
+  display: block;
+}
+
+.instructions {
+  text-align: center;
+}
+
+.instructions .wait-for-it {
+  display: block;
+}
+.instructions .jump-around {
+  display: none;
+}
+
+.hype .instructions .wait-for-it {
+  display: none;
+}
+.hype .instructions .jump-around {
+  display: block;
+}
 
 /* Space out content a bit */
 form, ul, table {
@@ -20,12 +52,16 @@ form, ul, table {
 }
 
 #brand-wrapper {
-  padding-top: 20px;
+  padding: 2em 0;
   text-align: center;
 }
 #brand {
   font-family: Helvetica, Arial, sans-serif;
   font-size: 32px;
+  text-align: center;
+}
+
+#instructions {
   text-align: center;
 }
 
@@ -110,7 +146,7 @@ form.link, form.button {
 .hearts {
   position: absolute;
   top: 25%;
-  left: 33%;
+  left: calc(50% - 50px);
   transform: translateY(-50%);
   display: none;
 }
@@ -152,7 +188,8 @@ form.link, form.button {
   -o-transform: rotate(45deg);
   transform: rotate(45deg);
 
-  -moz-animation: heartbeat 0.46875s infinite;
+  -webkit-animation: heartbeat 0.55555s infinite;
+  -moz-animation: heartbeat 0.55555s infinite;
 }
 
 .heart-shape:before,
@@ -185,6 +222,15 @@ form.link, form.button {
 .heart-shape:after{
   top: -50%;
   right: 0px;
+}
+
+@-webkit-keyframes heartbeat {
+  80% { transform: scale(1, 1) rotate(45deg);}
+  84% {  transform: scale(.9, .8) rotate(45deg); }
+  88% {  transform: scale(1.0, 1.2) rotate(45deg); }
+  92% {  transform: scale(1.0, 1.5) rotate(45deg); }
+  96% {  transform: scale(1.2, 1.3) rotate(45deg); }
+  100% { transform: scale(1.1, 1.1) rotate(45deg); }
 }
 
 @-moz-keyframes heartbeat {
