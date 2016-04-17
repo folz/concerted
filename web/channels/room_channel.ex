@@ -3,8 +3,15 @@ defmodule Concerted.RoomChannel do
   alias Concerted.Presence
 
   def join("rooms:lobby", _, socket) do
+    send self(), :ping
     send self(), :after_join
+    send self(), :collective?
     {:ok, socket}
+  end
+
+  def handle_info(:ping, socket) do
+    push socket, "ping", %{ping: "ping"}
+    {:noreply, socket}
   end
 
   def handle_info(:after_join, socket) do
@@ -24,12 +31,15 @@ defmodule Concerted.RoomChannel do
           if e.ingroup do 1 else 0 end + in_acc end),
          1 + total_acc}
       end)
-    IO.puts "# in the ingroup: #{ingroupers} of #{total}"
     broadcast! socket, "concerted", %{ingroupers: ingroupers, total: total}
     {:noreply, socket}
   end
 
-  def handle_in("effort", %{"ingroup" => ingroup} = params, socket) do
+  def handle_in("pong", "pong", socket) do
+    {:noreply, socket}
+  end
+
+  def handle_in("effort", %{"ingroup" => ingroup}, socket) do
     Presence.update(socket, socket.assigns.client_id, %{
       ingroup: case ingroup do
         "true" -> true

@@ -25,20 +25,24 @@ let socket = new Socket("/socket", {params: {}});
 socket.connect();
 
 let userList = document.getElementById('user-list');
+let collective = document.getElementById('collective');
 let room = socket.channel("rooms:lobby", {});
 let presences = {};
 
 let listBy = (id, {metas: [first, ...rest]}) => {
   first.name = id;
-  first.count = rest.length + 1;
   first.jumping = first.ingroup || rest.some((e) => e.ingroup === true);
   return first;
 }
 let render = (presences) => {
   userList.innerHTML = Presence.list(presences, listBy)
-    .map(user => `<li>${user.name} (${user.count}): ${user.jumping}</li>`)
+    .map(user => `<li>${user.name}: ${user.jumping}</li>`)
     .join("")
 }
+
+room.on("ping", ping => {
+  room.push("pong", "pong");
+})
 
 room.on("presence_state", state => {
   Presence.syncState(presences, state);
@@ -51,10 +55,14 @@ room.on("presence_diff", diff => {
 });
 
 room.on("concerted", counts => {
-  console.log("concerted", counts);
-  if (counts.ingroupers / counts.total > .5) {
-    console.log("party?");
-  }
+  let ratio = counts.ingroupers / counts.total * 200;
+  collective.innerHTML = `
+    <div class="progress">
+      <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="${ratio}" aria-valuemin="0" aria-valuemax="50" style="width: ${ratio}%">
+        <span class="sr-only">${ratio}% Complete</span>
+      </div>
+    </div>
+  `;
 });
 
 room.join();

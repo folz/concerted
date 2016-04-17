@@ -1,6 +1,12 @@
 <div class="jumbotron">
-  <h2><%= node() %></h2>
-  <form name="isJumping">
+  <div id="collective">
+    <div class="progress">
+      <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0">
+        <span class="sr-only">0% Complete</span>
+      </div>
+    </div>
+  </div>
+  <form name="isJumping" autocomplete="off">
     <span>Are you jumping?</span>
     <label><input type="radio" name="jumping" value="true" />Yes</label>
     <label><input type="radio" name="jumping" value="false" />No</label>
